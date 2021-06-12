@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScanningProductsApp.Domain;
 
 namespace ScanningProductsApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210612065022_FixAddIsSaleProduct")]
+    partial class FixAddIsSaleProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,9 +229,6 @@ namespace ScanningProductsApp.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<byte>("IsSale")
-                        .HasColumnType("tinyint unsigned");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(65,30)");

@@ -24,5 +24,11 @@ namespace ScanningProductsApp.Domain
         public DbSet<Brand> BrandCategory { get; set; }
         [Display(Name = "UnitOfAccount")]
         public DbSet<UnitOfAccount> UnitOfAccount { get; set; }
+        [Display(Name = "HistoryOrders")]
+        public DbSet<HistoryOrders> HistoryOrders { get; set; }
+        [Display(Name = "OrdersTable")]
+        public DbSet<Order> OrdersTable { get; set; }
+        [Display(Name = "PriceChangeHistory")]
+        public DbSet<PriceChangeHistory> PriceChangeHistory { get; set; }
     }
 }

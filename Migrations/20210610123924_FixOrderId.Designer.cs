@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScanningProductsApp.Domain;
 
 namespace ScanningProductsApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210610123924_FixOrderId")]
+    partial class FixOrderId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,31 +221,6 @@ namespace ScanningProductsApp.Migrations
                     b.ToTable("OrdersTable");
                 });
 
-            modelBuilder.Entity("ScanningProductsApp.Models.PriceChangeHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<byte>("IsSale")
-                        .HasColumnType("tinyint unsigned");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("PriceChangeHistory");
-                });
-
             modelBuilder.Entity("ScanningProductsApp.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -259,18 +236,13 @@ namespace ScanningProductsApp.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<byte>("IsSale")
-                        .HasColumnType("tinyint unsigned");
-
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<string>("UPCEAN")
-                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<int>("UnitOfAccountID")
@@ -452,17 +424,6 @@ namespace ScanningProductsApp.Migrations
                         .IsRequired();
 
                     b.Navigation("HistoryOrders");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("ScanningProductsApp.Models.PriceChangeHistory", b =>
-                {
-                    b.HasOne("ScanningProductsApp.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Product");
                 });

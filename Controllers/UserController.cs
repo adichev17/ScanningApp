@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ScanningProductsApp.Domain;
 using ScanningProductsApp.Models;
 
@@ -30,10 +31,16 @@ namespace ScanningProductsApp.Controllers
 
         [HttpGet("/GetUser")]
         [Authorize]
-        public IActionResult GetUser()
+        public async Task<IActionResult> GetUser()
         {
-            var user = _context.Users.SingleOrDefault(user => user.UserName == User.Identity.Name);
-            return Json(user);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.UserName == User.Identity.Name);
+            if (user != null)
+            {
+                // установка куки
+                await _signInManager.SignInAsync(user, false);
+                return Json(user);
+            }
+            return StatusCode(404);
         }
     }
 }

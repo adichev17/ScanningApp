@@ -103,7 +103,6 @@ namespace ScanningProductsApp.Controllers
                         token = new JwtSecurityTokenHandler().WriteToken(token),
                         expiration = token.ValidTo
                     };
-                    //await _signInManager.SignInAsync(user, false); // add self. No default
                     return Created("", results);
                 } else
                 {
