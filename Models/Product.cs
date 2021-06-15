@@ -30,6 +30,8 @@ namespace ScanningProductsApp.Models
         public UnitOfAccount UnitOfAccount { get; set; }
         [Required]
         public byte IsSale { get; set; }
+        [Required]
+        public string Image { get; set; }
 
     }
 }

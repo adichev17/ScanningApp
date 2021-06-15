@@ -60,7 +60,7 @@ namespace ScanningProductsApp.Controllers
                 }
                 return Ok();
             }
-            return BadRequest();
+            return StatusCode(501);
         }
 
         [HttpGet("/GetPurchaseHistory/{UserId}")]

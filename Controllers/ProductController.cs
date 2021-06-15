@@ -52,7 +52,8 @@ namespace ScanningProductsApp.Controllers
                         Brand = Brand,
                         UnitOfAccount = UnitOfAccount,
                         Price = model.Price,
-                        IsSale = model.IsSale
+                        IsSale = model.IsSale,
+                        Image = model.Image
                     };
                     await _context.ProductTable.AddAsync(newProduct);
                     await _context.SaveChangesAsync();
