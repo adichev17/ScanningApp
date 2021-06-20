@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ScanningProductsApp.Domain;
@@ -110,6 +111,29 @@ namespace ScanningProductsApp.Controllers
                 }
             }
             return BadRequest();
+        }
+
+        [HttpPatch("/UpdateProfile/{UserId}")]
+        public async Task<IActionResult> UpdateProfile(UserUpdateProfileModel model, string UserId)
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+            if (user != null)
+            {
+                try
+                {
+                    user.Email = model.Email;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.Name = model.Name;
+                    user.DateBirth = model.BirthDate;
+                }
+                catch (Exception)
+                {
+                    return StatusCode(501);
+                }
+                await _context.SaveChangesAsync();
+                return Json(user);
+            }
+            return Unauthorized();
         }
     }
 }

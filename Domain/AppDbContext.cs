@@ -30,5 +30,7 @@ namespace ScanningProductsApp.Domain
         public DbSet<Order> OrdersTable { get; set; }
         [Display(Name = "PriceChangeHistory")]
         public DbSet<PriceChangeHistory> PriceChangeHistory { get; set; }
+        [Display(Name = "SelectionForProducts")]
+        public DbSet<SelectionForProducts> SelectionForProducts { get; set; }
     }
 }

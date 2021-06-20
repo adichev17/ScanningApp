@@ -72,7 +72,8 @@ namespace ScanningProductsApp.Controllers
                         await _context.PriceChangeHistory.AddAsync(PriceChangeHistory);
                         await _context.SaveChangesAsync();
                         //
-                    } else
+                    }
+                    else
                     {
                         return StatusCode(500);
                     }
@@ -111,14 +112,37 @@ namespace ScanningProductsApp.Controllers
         [HttpPost("/GetProduct")]
         public async Task<IActionResult> GetProduct(ProductViewModel model)
         {
-            if (User.Identity.IsAuthenticated)
+
+            var product = await _context.ProductTable.FirstOrDefaultAsync(product => product.UPCEAN == model.UPCEAN);
+            if (product == null)
+                return UnprocessableEntity();
+
+            var RelatedProductsSorted = await _context.SelectionForProducts
+                .Where(position => position.AdjacentProduct == product || position.Product == product)
+                .OrderByDescending(position => position.Count)
+                .Select(position => position.AdjacentProduct == product ? position.Product : position.AdjacentProduct)
+                .Take(5)
+                .ToListAsync();
+
+            if (RelatedProductsSorted == null)
+                return UnprocessableEntity();
+
+
+            if (RelatedProductsSorted.Count < 6)
             {
-                var product = await _context.ProductTable.FirstOrDefaultAsync(product => product.UPCEAN == model.UPCEAN);
-                if(product!= null)
-                    return Json(product);
-                return StatusCode(500);
+                await foreach (var productFromDB in _context.ProductTable)
+                {
+                    if (!RelatedProductsSorted.Contains(productFromDB) && productFromDB != product)
+                    {
+                        RelatedProductsSorted.Add(productFromDB);
+                    }
+                    if (RelatedProductsSorted.Count == 6)
+                        break;
+                }
             }
-            return Unauthorized();
+
+            ResponseRequestProduct answer = new ResponseRequestProduct { Product = product, RelatedProducts = RelatedProductsSorted };
+            return Json(answer);
         }
 
         [HttpPost("/GetProductsByCategory")]
@@ -127,7 +151,7 @@ namespace ScanningProductsApp.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var products = await _context.ProductTable.Where(vl => vl.CategoryID == model.IDNameDivisions).ToListAsync();
-                if(products != null)
+                if (products != null)
                     return Json(products);
                 return NotFound();
             }

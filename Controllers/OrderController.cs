@@ -10,31 +10,63 @@ using ScanningProductsApp.Domain;
 using ScanningProductsApp.Models;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ScanningProductsApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class OrderController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly AppDbContext _context;
 
-        public OrderController(UserManager<User> userManager, SignInManager<User> signInManager, AppDbContext context)
+        public OrderController(UserManager<User> userManager, AppDbContext context)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _context = context;
         }
+
+        private async Task<IActionResult> AddingDependencieForPurchases(OrderViewModel model)
+        {
+            for (int i = 0; i < model.UPCEANProducts.Count - 1; ++i)
+            {
+                var productFromDB = await _context.ProductTable.FirstOrDefaultAsync(product => product.UPCEAN == model.UPCEANProducts[i].UPCEAN);
+                if (productFromDB == null)
+                    return UnprocessableEntity();
+                for (int j = i + 1; j < model.UPCEANProducts.Count; j++)
+                {
+                    var RelatedProductsFromDB = await _context.ProductTable.FirstOrDefaultAsync(product => product.UPCEAN == model.UPCEANProducts[j].UPCEAN);
+                    if (RelatedProductsFromDB == null)
+                        return UnprocessableEntity();
+
+                    var RelatedProducts = await _context.SelectionForProducts
+                    .FirstOrDefaultAsync(position => (position.Product == productFromDB && position.AdjacentProduct == RelatedProductsFromDB)
+                    || (position.Product == RelatedProductsFromDB && position.AdjacentProduct == productFromDB));
+
+                    if (RelatedProducts != null)
+                    {
+                        RelatedProducts.Count++;
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        SelectionForProducts SelectionForProducts = new SelectionForProducts { Product = productFromDB, AdjacentProduct = RelatedProductsFromDB, Count = 1 };
+                        await _context.SelectionForProducts.AddAsync(SelectionForProducts);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            };
+            return Ok();
+        }
+
         [HttpPost("/SubmitPurchase/{UserId}")]
         public async Task<IActionResult> SubmitPurchase(OrderViewModel model, string UserId)
         {
             var user = await _userManager.FindByIdAsync(UserId);
             if (user != null)
             {
-
                 HistoryOrders HistoryOrders = new HistoryOrders { DateTime = DateTime.Now, User = user, TotalСost = model.TotalСost };
 
                 await _context.HistoryOrders.AddAsync(HistoryOrders);
@@ -58,6 +90,10 @@ namespace ScanningProductsApp.Controllers
                         return BadRequest();
                     }
                 }
+
+                // adding dependencies for purchases(With this often take)
+                await AddingDependencieForPurchases(model);
+
                 return Ok();
             }
             return StatusCode(501);
@@ -72,26 +108,39 @@ namespace ScanningProductsApp.Controllers
                 .ToListAsync();
 
             if (IDUserOrders.Count == 0)
-                return NotFound();
+                return UnprocessableEntity();
 
             foreach (var IDitem in IDUserOrders)
             {
-                var FullOrder = new HistoryOrderViewModel();
+                var FullOrder = new HistoryOrderViewModel(); 
                 var order = await _context.HistoryOrders.FirstOrDefaultAsync(ord => ord.Id == IDitem);
 
                 var IDproducts = await _context.OrdersTable.Where(order => order.OrderId == IDitem)
                     .Select(product => product.ProductId)
                     .ToListAsync();
 
-                List<Product> product = new List<Product>();
+                List<ProductAndQuantityModel> ProductAndQuantityModel = new List<ProductAndQuantityModel>();
                 foreach (var IDproduct in IDproducts)
                 {
-                    product.Add(await _context.ProductTable.FirstOrDefaultAsync(product => product.Id == IDproduct));
-                }
+                    var product = await _context.ProductTable.FirstOrDefaultAsync(product => product.Id == IDproduct);
+                    var searchProductinList = ProductAndQuantityModel.Find(pr => pr.Product == product);
 
+                    if (searchProductinList != null)
+                    {
+                        searchProductinList.Count++;
+                    } else
+                    {
+                        ProductAndQuantityModel model = new ProductAndQuantityModel
+                        {
+                            Product = product,
+                            Count = 1
+                        };
+                        ProductAndQuantityModel.Add(model);
+                    }
+                }
                 FullOrder.DateTime = order.DateTime;
                 FullOrder.TotalСost = order.TotalСost;
-                FullOrder.ProductsIncludeOrder = product;
+                FullOrder.ProductsIncludeOrder = ProductAndQuantityModel;
 
                 HistoryOrders.Add(FullOrder);
             }

@@ -9,6 +9,6 @@ namespace ScanningProductsApp.Models
     {
         public DateTime DateTime { get; set; }
         public double TotalСost { get; set; }
-        public List<Product> ProductsIncludeOrder { get; set; }
+        public List<ProductAndQuantityModel> ProductsIncludeOrder { get; set; }
     }
 }
