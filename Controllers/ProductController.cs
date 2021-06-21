@@ -79,7 +79,7 @@ namespace ScanningProductsApp.Controllers
                     }
                     return Ok();
                 }
-                return BadRequest();
+                return UnprocessableEntity();
             }
             return Unauthorized();
         }

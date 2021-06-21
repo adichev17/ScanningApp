@@ -48,16 +48,17 @@ namespace ScanningProductsApp.Controllers
                     if (RelatedProducts != null)
                     {
                         RelatedProducts.Count++;
-                        await _context.SaveChangesAsync();
+                        //await _context.SaveChangesAsync();
                     }
                     else
                     {
                         SelectionForProducts SelectionForProducts = new SelectionForProducts { Product = productFromDB, AdjacentProduct = RelatedProductsFromDB, Count = 1 };
                         await _context.SelectionForProducts.AddAsync(SelectionForProducts);
-                        await _context.SaveChangesAsync();
+                        //await _context.SaveChangesAsync();
                     }
                 }
             };
+            await _context.SaveChangesAsync();
             return Ok();
         }
 
@@ -82,7 +83,7 @@ namespace ScanningProductsApp.Controllers
                         {
                             Order order = new Order { Product = product, HistoryOrders = OrderFromHistoryTable };
                             await _context.OrdersTable.AddAsync(order);
-                            await _context.SaveChangesAsync();
+                            //await _context.SaveChangesAsync();
                         }
                     }
                     else
@@ -94,9 +95,10 @@ namespace ScanningProductsApp.Controllers
                 // adding dependencies for purchases(With this often take)
                 await AddingDependencieForPurchases(model);
 
+                await _context.SaveChangesAsync();
                 return Ok();
             }
-            return StatusCode(501);
+            return Unauthorized();
         }
 
         [HttpGet("/GetPurchaseHistory/{UserId}")]
