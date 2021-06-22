@@ -48,6 +48,19 @@ namespace ScanningProductsApp
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(MVCJwtToken.Key))
                 };
             });
+
+            //setting password
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

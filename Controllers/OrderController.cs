@@ -68,7 +68,7 @@ namespace ScanningProductsApp.Controllers
             var user = await _userManager.FindByIdAsync(UserId);
             if (user != null)
             {
-                HistoryOrders HistoryOrders = new HistoryOrders { DateTime = DateTime.Now, User = user, TotalСost = model.TotalСost };
+                HistoryOrders HistoryOrders = new HistoryOrders { DateTime = DateTime.Now.AddHours(3), User = user, TotalСost = model.TotalСost };
 
                 await _context.HistoryOrders.AddAsync(HistoryOrders);
                 await _context.SaveChangesAsync();
