@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ScanningProductsApp.Domain;
+using ScanningProductsApp.Manager.Users;
 using ScanningProductsApp.Models;
 
 namespace ScanningProductsApp.Controllers
@@ -22,16 +23,11 @@ namespace ScanningProductsApp.Controllers
     [ApiController]
     public class AccountController : Controller
     {
+        private IAccountManager _AccountManager;
 
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly AppDbContext _context;
-
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, AppDbContext context)
+        public AccountController(IAccountManager accountManager)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _context = context;
+            _AccountManager = accountManager;
         }
 
         [Route("/reg")]
@@ -40,15 +36,11 @@ namespace ScanningProductsApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Name = model.Name, PhoneNumber = model.Number, UserName = model.UserLogin };
-                // добавляем пользователя
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                var user = await _AccountManager.Register(model);
+
+                if (user != null)
                 {
-                    // установка куки
-                    await _signInManager.SignInAsync(user, false);
                     return Json(user);
-                    //return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -58,57 +50,17 @@ namespace ScanningProductsApp.Controllers
             return View(model);
         }
 
-        private User AuthenticateUser(string userName, string password)
-        {
-            //return _context.Users.SingleOrDefault(u => u.UserName == userName && u.PasswordHash == password);
-            var user = _context.Users.SingleOrDefault(u => u.UserName == userName);
-            if (user != null)
-            {
-                Microsoft.AspNetCore.Identity.PasswordHasher<User> hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<User>();
-                var authUser = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
-                if (authUser != PasswordVerificationResult.Failed)
-                {
-                    return user;
-                }
-            }
-            return null;
-        }
-
         [HttpPost("/CreateToken")]
         public IActionResult CreateToken(JwtTokenViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = AuthenticateUser(model.UserName, model.Password);
+
+                var user = _AccountManager.CreateToken(model);
                 if (user != null)
-                {
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(MVCJwtToken.Key));
-                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                    var claims = new[]
-                    {
-                        new Claim(JwtRegisteredClaimNames.Sub, model.UserName),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(JwtRegisteredClaimNames.UniqueName, model.UserName)
-                    };
-                    var token = new JwtSecurityToken(
-                        MVCJwtToken.Issuer,
-                        MVCJwtToken.Audience,
-                        claims,
-                        expires: DateTime.UtcNow.AddMinutes(30),
-                        signingCredentials: creds
-                        );
-
-                    var results = new
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                        expiration = token.ValidTo
-                    };
-                    return Created("", results);
-                } else
-                {
-                    return BadRequest();
-                }
+                    return Created("", user);
+                else
+                    return Unauthorized();
             }
             return BadRequest();
         }
@@ -116,22 +68,13 @@ namespace ScanningProductsApp.Controllers
         [HttpPatch("/UpdateProfile/{UserId}")]
         public async Task<IActionResult> UpdateProfile(UserUpdateProfileModel model, string UserId)
         {
-            var user = await _userManager.FindByIdAsync(UserId);
-            if (user != null)
+            if (User.Identity.IsAuthenticated)
             {
-                try
+                var user = await _AccountManager.UpdateProfile(model, UserId);
+                if (user != null)
                 {
-                    user.Email = model.Email;
-                    user.PhoneNumber = model.PhoneNumber;
-                    user.Name = model.Name;
-                    user.DateBirth = model.BirthDate;
-                }
-                catch (Exception)
-                {
-                    return StatusCode(501);
-                }
-                await _context.SaveChangesAsync();
-                return Json(user);
+                    return Json(user);
+                };
             }
             return Unauthorized();
         }

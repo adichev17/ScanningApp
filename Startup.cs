@@ -16,6 +16,9 @@ using Microsoft.CodeAnalysis.FlowAnalysis;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ScanningProductsApp.Manager.Users;
+using ScanningProductsApp.Manager.Orders;
+using ScanningProductsApp.Manager.Products;
 
 namespace ScanningProductsApp
 {
@@ -33,6 +36,11 @@ namespace ScanningProductsApp
         {
 
             services.AddDbContext<AppDbContext>(options => options.UseMySql(Configuration.GetConnectionString("Release")));
+
+            services.AddScoped<IAccountManager, AccountManager>();
+            services.AddScoped<IOrderManager, OrderManager>();
+            services.AddScoped<IProductManager, ProductManager>();
+
 
             services.AddIdentity<User, IdentityRole>()
                .AddEntityFrameworkStores<AppDbContext>();

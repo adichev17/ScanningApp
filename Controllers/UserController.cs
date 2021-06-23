@@ -17,14 +17,11 @@ namespace ScanningProductsApp.Controllers
     [Authorize(AuthenticationSchemes = MVCJwtToken.AuthSchemes)]
     public class UserController : Controller
     {
-
-        private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly AppDbContext _context;
 
-        public UserController(UserManager<User> userManager, SignInManager<User> signInManager, AppDbContext context)
+        public UserController(SignInManager<User> signInManager, AppDbContext context)
         {
-            _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
         }

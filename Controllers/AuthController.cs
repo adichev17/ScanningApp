@@ -29,7 +29,6 @@ namespace ScanningProductsApp.Controllers
         [HttpPost("/DecryptingPassword")]
         public User DecryptingPassword(string userName, string password = "ADE$25103001_Ad")
         {
-            //return _context.Users.SingleOrDefault(u => u.UserName == userName && u.PasswordHash == password);
 
             var user = _context.Users.SingleOrDefault(u => u.UserName == "Dimon123");
             if (user != null)
