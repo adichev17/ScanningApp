@@ -12,7 +12,5 @@ namespace ScanningProductsApp.Manager.Products
         public Task<Product> AddProduct(Product model);
         public Task<Product> UpdatePriceProduct(ProductPriceChangeHistoryViewModel model);
         public Task<ResponseRequestProduct> GetProduct(ProductViewModel model);
-        public Task<List<Product>> GetProductsByCategory(ProductViewCategoryOrBrand model);
-        public Task<List<Product>> GetProductsByBrand(ProductViewCategoryOrBrand model);
     }
 }

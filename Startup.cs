@@ -19,6 +19,9 @@ using System.Text;
 using ScanningProductsApp.Manager.Users;
 using ScanningProductsApp.Manager.Orders;
 using ScanningProductsApp.Manager.Products;
+using Microsoft.VisualStudio.Web.CodeGeneration.Utils.Messaging;
+using ScanningProductsApp.Services;
+using IMessageSender = ScanningProductsApp.Services.IMessageSender;
 
 namespace ScanningProductsApp
 {
@@ -40,6 +43,9 @@ namespace ScanningProductsApp
             services.AddScoped<IAccountManager, AccountManager>();
             services.AddScoped<IOrderManager, OrderManager>();
             services.AddScoped<IProductManager, ProductManager>();
+            services.AddScoped<IMessageSender, MessageManager>();
+
+            services.AddScoped<IFilterProduct, BrandSpecificationProductManager>();
 
 
             services.AddIdentity<User, IdentityRole>()

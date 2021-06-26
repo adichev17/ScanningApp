@@ -22,7 +22,7 @@ namespace ScanningProductsApp.Controllers
     {
 
         private readonly IOrderManager _orderManager;
-        public OrderController(UserManager<User> userManager, AppDbContext context, IOrderManager orderManager)
+        public OrderController(IOrderManager orderManager)
         {
             _orderManager= orderManager;
         }

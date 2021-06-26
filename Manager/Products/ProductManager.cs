@@ -103,24 +103,6 @@ namespace ScanningProductsApp.Manager.Products
             return answer;
         }
 
-        public async Task<List<Product>> GetProductsByBrand(ProductViewCategoryOrBrand model)
-        {
-            var products = await _context.ProductTable.Where(vl => vl.BrandID == model.IDNameDivisions).ToListAsync();
-            if (products != null)
-                return products;
-
-            return null;
-        }
-
-        public async Task<List<Product>> GetProductsByCategory(ProductViewCategoryOrBrand model)
-        {
-            var products = await _context.ProductTable.Where(vl => vl.CategoryID == model.IDNameDivisions).ToListAsync();
-            if (products != null)
-                return products;
-
-            return null;
-        }
-
         public async Task<Product> UpdatePriceProduct(ProductPriceChangeHistoryViewModel model)
         {
             var product = await _context.ProductTable.FirstOrDefaultAsync(product => product.UPCEAN == model.UPCEAN);
