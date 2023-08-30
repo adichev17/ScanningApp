@@ -15,6 +15,7 @@ link: https://youtu.be/t9ebX1XbUs4
 - .NET 5.
 - ASP NET MVC
 - EF Core 5
+- MS SQL SERVER
 - React-Native (repository: https://github.com/denis200/react_native_scan_app_v2)
 
 ## Getting Started
