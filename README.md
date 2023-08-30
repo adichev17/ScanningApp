@@ -1,4 +1,4 @@
-![Build Status](https://github.com/adichev17/Patterns/workflows/.NET%20Core%20Desktop/badge.svg)
+![Build Status](https://github.com/adichev17/Patterns/workflows/Actions/badge.svg)
 ![GitHub repo size](https://img.shields.io/github/repo-size/adichev17/ScanningApp-ASP-MVC)
 ![MicrosoftSQLServer](https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=for-the-badge&logo=microsoft%20sql%20server&logoColor=white)
 ![.Net](https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white)
