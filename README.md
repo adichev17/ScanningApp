@@ -12,7 +12,7 @@ link: https://youtu.be/t9ebX1XbUs4
 
 ## Stack
 
-- .NET 5.
+- .NET Core 3.1
 - ASP NET MVC
 - EF Core 5
 - MS SQL SERVER
