@@ -10,6 +10,10 @@ Scanny App
 
 link: https://youtu.be/t9ebX1XbUs4
 
+## Docs
+
+link: https://www.notion.so/ScannerApp-b9d1b736b341432ca3e5569ae2576e15?pvs=4
+
 ## Stack
 
 - .NET Core 3.1
