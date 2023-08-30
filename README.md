@@ -22,6 +22,6 @@ link: https://youtu.be/t9ebX1XbUs4
 ### Installing
 
 ```
-git clone https://github.com/adichev17/Patterns
+git clone https://github.com/adichev17/ScanningApp-ASP-MVC.git
 ```
 
